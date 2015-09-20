@@ -1,0 +1,10 @@
+{
+    "name": "antron/arana",
+    "authors": [
+        {
+            "name": "antron",
+            "email": "antron@cocobat.com"
+        }
+    ],
+    "require": {}
+}
