@@ -5,34 +5,23 @@ namespace Antron\Arana;
 class Arana
 {
 
-    public static function readCsv($filepath, $config)
+    public static function readCsv($config_arg)
     {
-        if (isset($config['delimiter'])) {
-            $delimiter = $config['delimiter'];
-        } else {
-            $delimiter = ',';
-        }
-        if (isset($config['header'])) {
-            $header = $config['header'];
-        } else {
-            $header = true;
-        }
-        if (isset($config['encode'])) {
-            $encode = $config['encode'];
-        } else {
-            $encode = 'UTF-8';
-        }
 
         $csv = [];
 
-        $texts = self::readTxt($filepath, $encode);
+        $config = self::config($config_arg);
+
+        $texts = self::readTxt($config['filepath'], $config['encode']);
 
         foreach ($texts as $text) {
-            $array = str_replace(['"'], '', $text);
-            $csv[] = explode($delimiter, $array);
+            if ($config['quotation']) {
+                $text = str_replace(['"'], '', $text);
+            }
+            $csv[] = explode($config['delimiter'], $text);
         }
 
-        if ($header) {
+        if ($config['header']) {
             return self::toHash($csv);
         } else {
             return $csv;
@@ -60,6 +49,39 @@ class Arana
         }
 
         return $texts;
+    }
+
+    public static function write($arrays, $config_arg)
+    {
+        $config = self::config($config_arg);
+
+        foreach ($arrays as $array) {
+            $string_implode.=implode($config['delimiter'], $array) . "\n";
+        }
+
+        $string_texts = mb_convert_encoding($string_implode, $config['encode'], 'UTF-8');
+        
+        file_put_contents($config['filepath'], $string_texts);
+    }
+
+    private static function config($config)
+    {
+        if (!isset($config['delimiter'])) {
+            $config['delimiter'] = ',';
+        }
+        if (!isset($config['header'])) {
+            $config['header'] = true;
+        }
+        if (!isset($config['encode'])) {
+            $config['encode'] = 'UTF-8';
+        }
+        if (!isset($config['quotation'])) {
+            $config['quotation'] = true;
+        }
+        if (!isset($config['filepath'])) {
+            $config['filepath'] = storage_path('arana.txt');
+        }
+        return $config;
     }
 
     private static function toHash($csv)
