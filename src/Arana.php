@@ -12,7 +12,7 @@ class Arana
 
         $config = self::config($config_arg);
 
-        $texts = self::readTxt($config['filepath'], $config['encode']);
+        $texts = self::readTxt($config['filepath'], $config['encode'], $config['kana']);
 
         foreach ($texts as $text) {
             if ($config['quotation']) {
@@ -28,7 +28,7 @@ class Arana
         }
     }
 
-    public static function readTxt($filepath, $encode = 'UTF-8')
+    public static function readTxt($filepath, $encode,$kana)
     {
         $texts = [];
 
@@ -37,6 +37,10 @@ class Arana
         }
 
         $buf = file_get_contents($filepath);
+
+	if($kana){
+            $buf=mb_convert_kana($buf,"KV");
+	}
 
         if ($encode !== 'UTF-8') {
             $buf = mb_convert_encoding($buf, 'UTF-8', $encode);
@@ -80,6 +84,9 @@ class Arana
         }
         if (!isset($config['filepath'])) {
             $config['filepath'] = storage_path('arana.txt');
+        }
+        if (!isset($config['kana'])) {
+            $config['kana'] = false;
         }
         return $config;
     }
