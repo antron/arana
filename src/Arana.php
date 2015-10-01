@@ -28,7 +28,7 @@ class Arana
         }
     }
 
-    public static function readTxt($filepath, $encode,$kana)
+    public static function readTxt($filepath, $encode, $kana = false)
     {
         $texts = [];
 
@@ -38,12 +38,12 @@ class Arana
 
         $buf = file_get_contents($filepath);
 
-	if($kana){
-            $buf=mb_convert_kana($buf,"KV");
-	}
-
         if ($encode !== 'UTF-8') {
             $buf = mb_convert_encoding($buf, 'UTF-8', $encode);
+        }
+
+        if ($kana) {
+            $buf = mb_convert_kana($buf, "KV");
         }
 
         $lines = str_getcsv(rtrim($buf, "\x1A"), "\n");
@@ -64,7 +64,7 @@ class Arana
         }
 
         $string_texts = mb_convert_encoding($string_implode, $config['encode'], 'UTF-8');
-        
+
         file_put_contents($config['filepath'], $string_texts);
     }
 
@@ -110,5 +110,4 @@ class Arana
 
         return $hash;
     }
-
 }
