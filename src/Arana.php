@@ -4,6 +4,13 @@ namespace Antron\Arana;
 
 class Arana
 {
+    private static $config=[
+        'delimiter'=>',',
+        'header'=>true,
+        'encode'=>'UTF-8',
+        'quotation'=>true,
+        'kana'=>false,
+    ];
 
     public static function readCsv($config_arg)
     {
@@ -55,9 +62,17 @@ class Arana
         return $texts;
     }
 
-    public static function write($arrays, $config_arg)
+    public static function write($arrays, $config_arg=[])
     {
+        $string_implode = '';
+
         $config = self::config($config_arg);
+
+        if ($config['header']) {
+            $array_tmp = array_shift($arrays);
+
+            $string_implode.=implode($config['delimiter'], array_flip($array_tmp)) . "\n";
+        }
 
         foreach ($arrays as $array) {
             $string_implode.=implode($config['delimiter'], $array) . "\n";
@@ -70,30 +85,21 @@ class Arana
 
     private static function config($config)
     {
-        if (!isset($config['delimiter'])) {
-            $config['delimiter'] = ',';
-        }
-        if (!isset($config['header'])) {
-            $config['header'] = true;
-        }
-        if (!isset($config['encode'])) {
-            $config['encode'] = 'UTF-8';
-        }
-        if (!isset($config['quotation'])) {
-            $config['quotation'] = true;
-        }
         if (!isset($config['filepath'])) {
             $config['filepath'] = storage_path('arana.txt');
         }
-        if (!isset($config['kana'])) {
-            $config['kana'] = false;
-        }
-        return $config;
+        
+        return $config + self::$config;
     }
 
     private static function toHash($csv)
     {
         $hash = [];
+        
+        if(!$csv){
+            return $hash;
+        }
+        
         foreach (array_shift($csv) as $key => $value) {
             $heads[$key] = $value;
         }
