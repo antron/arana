@@ -1,9 +1,20 @@
 <?php
-
+/**
+ * Arana.
+ */
 namespace Antron\Arana;
 
-class Arana {
+/**
+ * Arana.
+ */
+class Arana
+{
 
+    /**
+     * Default config.
+     *
+     * @var array
+     */
     private static $config = [
         'delimiter' => ',',
         'header' => true,
@@ -12,8 +23,14 @@ class Arana {
         'kana' => false,
     ];
 
-    public static function readCsv($config_arg) {
-
+    /**
+     * Read CSV File.
+     * 
+     * @param array $config_arg Config
+     * @return array Data
+     */
+    public static function readCsv($config_arg)
+    {
         $csv = [];
 
         $config = self::config($config_arg);
@@ -34,7 +51,16 @@ class Arana {
         }
     }
 
-    public static function readTxt($filepath, $encode = '', $kana = false) {
+    /**
+     * Read Text.
+     * 
+     * @param string $filepath Filepath
+     * @param string $encode encode
+     * @param boolean $kana TRUE is 
+     * @return array
+     */
+    public static function readTxt($filepath, $encode = 'UTF-8', $kana = false)
+    {
         $texts = [];
 
         if (!file_exists($filepath)) {
@@ -60,7 +86,15 @@ class Arana {
         return $texts;
     }
 
-    public static function write($arrays, $config_arg = []) {
+    /**
+     * Write FIle.
+     *
+     * @param array $arrays
+     * @param array $config_arg config
+     * @return void
+     */
+    public static function write($arrays, $config_arg = [])
+    {
         if (!$arrays) {
             return;
         }
@@ -88,7 +122,14 @@ class Arana {
         file_put_contents($config['filepath'], $string_texts);
     }
 
-    private static function config($config) {
+    /**
+     * make Config.
+     *
+     * @param array $config Config
+     * @return array Config
+     */
+    private static function config($config)
+    {
         if (!isset($config['filepath'])) {
             $config['filepath'] = storage_path('arana.txt');
         }
@@ -96,33 +137,31 @@ class Arana {
         return $config + self::$config;
     }
 
-    private static function toHash($csv) {
+    /**
+     * to Hash.
+     *
+     * @param array $csv
+     * @return array
+     */
+    private static function toHash($csv)
+    {
         $hash = [];
-
-        $heads = [];
-
-        $count = 1;
-
-        $dupli = [];
 
         if (!$csv) {
             return $hash;
         }
-
-        foreach (array_shift($csv) as $key => $value) {
-            if (isset($dupli[$value])) {
-                $heads[$key] = "$value$count";
-                $count++;
-            } else {
-                $heads[$key] = $value;
-            }
-        }
+        
+        $heads= self::getHeads(array_shift($csv));
 
         foreach ($csv as $datas) {
             $tmpdata = [];
 
             foreach ($datas as $key => $value) {
-                $tmpdata[$heads[$key]] = $value;
+                if (isset($heads[$key])) {
+                    $tmpdata[$heads[$key]] = $value;
+                } else {
+                    return [];
+                }
             }
 
             $hash[] = $tmpdata;
@@ -131,4 +170,30 @@ class Arana {
         return $hash;
     }
 
+    /**
+     * get Heads
+     * 
+     * @param array $csv
+     * @return array
+     */
+    private static function getHeads($csv)
+    {
+        $count = 1;
+
+        $dupli = [];
+        
+        $heads=[];
+
+        foreach ($csv as $key => $value) {
+            if (isset($dupli[$value])) {
+                $heads[$key] = "$value$count";
+
+                $count++;
+            } else {
+                $heads[$key] = $value;
+            }
+        }
+        
+        return $heads;
+    }
 }
