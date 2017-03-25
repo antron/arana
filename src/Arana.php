@@ -2,8 +2,17 @@
 
 namespace Antron\Arana;
 
-class Arana {
+/**
+ * Arana.
+ */
+class Arana
+{
 
+    /**
+     * Default config.
+     *
+     * @var array
+     */
     private static $config = [
         'delimiter' => ',',
         'header' => true,
@@ -12,7 +21,8 @@ class Arana {
         'kana' => false,
     ];
 
-    public static function readCsv($config_arg) {
+    public static function readCsv($config_arg)
+    {
 
         $csv = [];
 
@@ -34,7 +44,8 @@ class Arana {
         }
     }
 
-    public static function readTxt($filepath, $encode = '', $kana = false) {
+    public static function readTxt($filepath, $encode = '', $kana = false)
+    {
         $texts = [];
 
         if (!file_exists($filepath)) {
@@ -60,7 +71,8 @@ class Arana {
         return $texts;
     }
 
-    public static function write($arrays, $config_arg = []) {
+    public static function write($arrays, $config_arg = [])
+    {
         if (!$arrays) {
             return;
         }
@@ -88,7 +100,8 @@ class Arana {
         file_put_contents($config['filepath'], $string_texts);
     }
 
-    private static function config($config) {
+    private static function config($config)
+    {
         if (!isset($config['filepath'])) {
             $config['filepath'] = storage_path('arana.txt');
         }
@@ -96,7 +109,8 @@ class Arana {
         return $config + self::$config;
     }
 
-    private static function toHash($csv) {
+    private static function toHash($csv)
+    {
         $hash = [];
 
         $heads = [];
@@ -112,6 +126,7 @@ class Arana {
         foreach (array_shift($csv) as $key => $value) {
             if (isset($dupli[$value])) {
                 $heads[$key] = "$value$count";
+                
                 $count++;
             } else {
                 $heads[$key] = $value;

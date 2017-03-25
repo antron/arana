@@ -22,7 +22,7 @@ class AranaServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app['arana'] = $this->app->share(function($app)
+        $this->app->singleton('arana',function($app)
         {
             return new Arana;
         });
